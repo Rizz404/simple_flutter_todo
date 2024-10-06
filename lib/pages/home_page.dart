@@ -45,6 +45,12 @@ class _MainPageState extends State<MainPage> {
         });
   }
 
+  void handleDelete(int index) {
+    setState(() {
+      todoList.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,6 +78,7 @@ class _MainPageState extends State<MainPage> {
                   todoName: todo['todoName'],
                   isTaskCompleted: todo['isTaskCompleted'],
                   onChanged: (value) => handleCheckboxChanged(value, index),
+                  handleDelete: (context) => handleDelete(index),
                 );
               },
               itemCount: todoList.length,
