@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:simple_flutter_todo/components/ui/my_button.dart';
 
 class TodoForm extends StatelessWidget {
-  final controller;
+  final TextEditingController todoNameController;
+  final TextEditingController detailController;
   VoidCallback onSave;
   VoidCallback onCancel;
 
   TodoForm(
       {super.key,
-      required this.controller,
+      required this.todoNameController,
+      required this.detailController,
       required this.onSave,
       required this.onCancel});
 
@@ -19,13 +21,21 @@ class TodoForm extends StatelessWidget {
       content: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(4)),
-        height: 120,
         child: Column(
           children: [
             TextField(
-                controller: controller,
+                controller: todoNameController,
                 decoration: const InputDecoration(
                     border: OutlineInputBorder(), hintText: "Add todo title")),
+            TextField(
+              controller: detailController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: "Add todo details",
+              ),
+              maxLines: 4, // Dapat diatur sesuai kebutuhan
+              minLines: 3, // Minimum baris yang ditampilkan
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

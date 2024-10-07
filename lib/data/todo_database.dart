@@ -21,7 +21,10 @@ class TodoDatabase {
   // * Nama function jangan diganti ganti
   void loadTodos() {
     // * Key value pair jangan sampe salah
-    todoList = _todoBox.get('TODO_LIST', defaultValue: []);
+    // * Ambil data dari Hive dan cast ke List<Todo>
+    final rawList = _todoBox.get('TODO_LIST', defaultValue: []);
+
+    todoList = rawList.cast<Todo>();
     print(todoList);
   }
 

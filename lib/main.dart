@@ -7,6 +7,7 @@ void main() async {
   // * Assign librarynya ke main file (sama kaya react)
   await Hive.initFlutter();
 
+  // ! harus ada sebelum open box
   // * Register model-modelnya disini
   Hive.registerAdapter(TodoAdapter());
 

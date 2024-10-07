@@ -30,7 +30,8 @@ class _MainPageState extends State<MainPage> {
   }
 
   // * Kayak akses value di input html
-  final _controller = TextEditingController();
+  final _controllerTodoName = TextEditingController();
+  final _controllerDetail = TextEditingController();
 
   void handleCheckboxChanged(bool? value, int index) {
     setState(() {
@@ -42,9 +43,11 @@ class _MainPageState extends State<MainPage> {
   void handleSave() {
     setState(() {
       // * Belum tambahin input buat detail
-      todoDatabase.todoList
-          .add(Todo(todoName: _controller.text, isTaskCompleted: false));
-      _controller.clear();
+      todoDatabase.todoList.add(Todo(
+          todoName: _controllerTodoName.text,
+          detail: _controllerDetail.text,
+          isTaskCompleted: false));
+      _controllerTodoName.clear();
     });
     Navigator.of(context).pop();
     todoDatabase.updateTodos();
@@ -62,7 +65,8 @@ class _MainPageState extends State<MainPage> {
         context: context,
         builder: (context) {
           return TodoForm(
-            controller: _controller,
+            todoNameController: _controllerTodoName,
+            detailController: _controllerDetail,
             onSave: () => handleSave(),
             onCancel: () => Navigator.of(context).pop(),
           );
@@ -92,6 +96,7 @@ class _MainPageState extends State<MainPage> {
 
                 return TodoTile(
                   todoName: todo.todoName,
+                  detail: todo.detail ?? '',
                   isTaskCompleted: todo.isTaskCompleted ?? false,
                   onChanged: (value) => handleCheckboxChanged(value, index),
                   handleDelete: (context) => handleDelete(index),

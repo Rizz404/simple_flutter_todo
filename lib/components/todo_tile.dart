@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 class TodoTile extends StatelessWidget {
   final String todoName;
+  final String detail;
   final bool isTaskCompleted;
   Function(bool?) onChanged;
   Function(BuildContext?) handleDelete;
@@ -10,6 +11,7 @@ class TodoTile extends StatelessWidget {
   TodoTile({
     super.key,
     required this.todoName,
+    required this.detail,
     required this.isTaskCompleted,
     required this.onChanged,
     required this.handleDelete,
@@ -60,7 +62,8 @@ class TodoTile extends StatelessWidget {
                   decorationStyle: TextDecorationStyle
                       .solid, // Tipe garis (solid, double, wavy, dll)
                 ),
-              )
+              ),
+              Text(detail)
             ],
           )),
     );
