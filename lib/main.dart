@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:simple_flutter_todo/model/todo_model.dart';
 import 'package:simple_flutter_todo/pages/home_page.dart';
 
-void main() {
+void main() async {
+  // * Assign librarynya ke main file (sama kaya react)
+  await Hive.initFlutter();
+
+  // * Register model-modelnya disini
+  Hive.registerAdapter(TodoAdapter());
+
+  // * Config hive nya
+  var box = await Hive.openBox('todoBox'); // * Nama databasenya (prefixnya box)
+
   runApp(const MyApp());
 }
 

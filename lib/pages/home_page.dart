@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:simple_flutter_todo/components/todo_form.dart';
 import 'package:simple_flutter_todo/components/todo_tile.dart';
+import 'package:simple_flutter_todo/data/todo_database.dart';
+import 'package:simple_flutter_todo/model/todo_model.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -10,45 +13,60 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  final _controller = TextEditingController();
+  // * Referensi databasenya
+  // ! namanya harus sama kaya di main file
+  final _todoBox = Hive.box("todoBox");
+  TodoDatabase todoDatabase = TodoDatabase();
 
-  // * Default data
-  // todo: buat classsnya dulu biar ada auto complete
-  List<Map<String, dynamic>> todoList = [
-    {'todoName': "Sholat dulu", 'isTaskCompleted': false},
-    {'todoName': "Tidur tepat waktu", 'isTaskCompleted': false},
-    {'todoName': "Jangan mainin titit", 'isTaskCompleted': false},
-  ];
+  // * Ini ada snippetnya ya, jangan manual
+  @override
+  void initState() {
+    if (_todoBox.get('TODO_LIST') == null) {
+      todoDatabase.createInitialData();
+    } else {
+      todoDatabase.loadTodos();
+    }
+    super.initState();
+  }
+
+  // * Kayak akses value di input html
+  final _controller = TextEditingController();
 
   void handleCheckboxChanged(bool? value, int index) {
     setState(() {
-      todoList[index]['isTaskCompleted'] = !todoList[index]['isTaskCompleted'];
+      todoDatabase.todoList[index].isTaskCompleted = value ?? false;
     });
+    todoDatabase.updateTodos();
   }
 
-  void handleAddTodo() {
+  void handleSave() {
+    setState(() {
+      // * Belum tambahin input buat detail
+      todoDatabase.todoList
+          .add(Todo(todoName: _controller.text, isTaskCompleted: false));
+      _controller.clear();
+    });
+    Navigator.of(context).pop();
+    todoDatabase.updateTodos();
+  }
+
+  void handleDelete(int index) {
+    setState(() {
+      todoDatabase.todoList.removeAt(index);
+    });
+    todoDatabase.updateTodos();
+  }
+
+  void handleOpenDialog() {
     showDialog(
         context: context,
         builder: (context) {
           return TodoForm(
             controller: _controller,
-            onSave: () {
-              setState(() {
-                todoList.add(
-                    {'todoName': _controller.text, 'isTaskCompleted': false});
-                _controller.clear();
-              });
-              Navigator.of(context).pop();
-            },
+            onSave: () => handleSave(),
             onCancel: () => Navigator.of(context).pop(),
           );
         });
-  }
-
-  void handleDelete(int index) {
-    setState(() {
-      todoList.removeAt(index);
-    });
   }
 
   @override
@@ -62,9 +80,7 @@ class _MainPageState extends State<MainPage> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {},
           child: IconButton(
-            onPressed: () {
-              handleAddTodo();
-            },
+            onPressed: () => handleOpenDialog(),
             icon: const Icon(Icons.add),
           ),
         ),
@@ -72,16 +88,16 @@ class _MainPageState extends State<MainPage> {
             padding: const EdgeInsets.all(24),
             child: ListView.builder(
               itemBuilder: (context, index) {
-                final todo = todoList[index];
+                final todo = todoDatabase.todoList[index];
 
                 return TodoTile(
-                  todoName: todo['todoName'],
-                  isTaskCompleted: todo['isTaskCompleted'],
+                  todoName: todo.todoName,
+                  isTaskCompleted: todo.isTaskCompleted ?? false,
                   onChanged: (value) => handleCheckboxChanged(value, index),
                   handleDelete: (context) => handleDelete(index),
                 );
               },
-              itemCount: todoList.length,
+              itemCount: todoDatabase.todoList.length,
             )));
   }
 }
