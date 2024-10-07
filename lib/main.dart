@@ -23,9 +23,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const MainPage(),
-      theme: ThemeData(primarySwatch: Colors.grey),
-    );
+        debugShowCheckedModeBanner: false,
+        home: const HomePage(),
+        theme: ThemeData(
+            primarySwatch: Colors.blueGrey,
+            scaffoldBackgroundColor: Colors.grey.shade100,
+            appBarTheme: AppBarTheme(
+                backgroundColor: Colors.blueGrey.shade700, elevation: 0),
+            floatingActionButtonTheme: FloatingActionButtonThemeData(
+                backgroundColor: Colors.blueGrey.shade600),
+            bottomAppBarTheme: BottomAppBarTheme(
+              color: Colors.blueGrey.shade700,
+            )));
   }
 }

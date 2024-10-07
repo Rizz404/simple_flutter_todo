@@ -4,10 +4,10 @@ import 'package:simple_flutter_todo/components/ui/my_button.dart';
 class TodoForm extends StatelessWidget {
   final TextEditingController todoNameController;
   final TextEditingController detailController;
-  VoidCallback onSave;
-  VoidCallback onCancel;
+  final VoidCallback onSave;
+  final VoidCallback onCancel;
 
-  TodoForm(
+  const TodoForm(
       {super.key,
       required this.todoNameController,
       required this.detailController,
@@ -17,38 +17,56 @@ class TodoForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.grey.shade300,
-      content: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(4)),
+      backgroundColor: Colors.grey.shade100,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      content: SingleChildScrollView(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-                controller: todoNameController,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(), hintText: "Add todo title")),
+              controller: todoNameController,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                hintText: "Todo name",
+                labelText: "Judul",
+              ),
+            ),
+            const SizedBox(height: 16),
             TextField(
               controller: detailController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: "Add todo details",
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.white,
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                hintText: "Detail tugas",
+                labelText: "Detail",
               ),
-              maxLines: 4, // Dapat diatur sesuai kebutuhan
-              minLines: 3, // Minimum baris yang ditampilkan
+              maxLines: 4,
+              minLines: 3,
+            ),
+            const SizedBox(
+              height: 24,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                MyButton(
-                  text: "Cancel",
+                TextButton(
                   onPressed: onCancel,
+                  child: Text("Batal",
+                      style: TextStyle(color: Colors.blueGrey[700])),
                 ),
-                const SizedBox(
-                  width: 8,
-                ),
-                MyButton(
-                  text: "Save",
+                const SizedBox(width: 8),
+                ElevatedButton(
                   onPressed: onSave,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueGrey[600],
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text("Simpan"),
                 ),
               ],
             )
