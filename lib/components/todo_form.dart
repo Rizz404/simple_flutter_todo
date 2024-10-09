@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:simple_flutter_todo/components/ui/my_button.dart';
 
 class TodoForm extends StatelessWidget {
-  final TextEditingController todoNameController;
+  final TextEditingController taskNameController;
   final TextEditingController detailController;
   final VoidCallback onSave;
   final VoidCallback onCancel;
 
   const TodoForm(
       {super.key,
-      required this.todoNameController,
+      required this.taskNameController,
       required this.detailController,
       required this.onSave,
       required this.onCancel});
@@ -24,7 +23,7 @@ class TodoForm extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              controller: todoNameController,
+              controller: taskNameController,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Colors.white,

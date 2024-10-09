@@ -2,33 +2,53 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:simple_flutter_todo/model/todo_model.dart';
 
 class TodoDatabase {
-  List<Todo> todoList = [];
-
   // * Referensi box tadi
-  final _todoBox = Hive.box('todoBox');
+  final Box<Todo> _todoBox = Hive.box('todoBox');
+
+  void addTodo(Todo newTodo) {
+    _todoBox.add(newTodo);
+  }
+
+  List<Todo> getTodos() {
+    return _todoBox.values.map((dynamic item) => item as Todo).toList();
+  }
+
+  // ! KAN INDEX MULAI DARI 0 TAPI LENGTH ITU UKURANNYA JADI JANGAN SAMA LEBIH DARI SAMA DENGAN
+  Todo? getTodoAt(int index) {
+    if (index < _todoBox.length) {
+      return _todoBox.getAt(index);
+    }
+
+    return null;
+  }
+
+  void updateTodo(int index, Todo todo) {
+    _todoBox.putAt(index, todo);
+  }
+
+  void deleteTodo(int index) {
+    if (index < _todoBox.length) {
+      _todoBox.deleteAt(index);
+    }
+  }
 
   void createInitialData() {
-    todoList = [
-      Todo(
-          todoName: 'Pertama kali buka todo ya!',
-          detail:
-              'Klik tombol plus di kanan bawah untuk add todo dan slide lalu klik tombol sampah untuk hapus todo'),
-      Todo(todoName: 'Ini bisa kamu hapus kok'),
-      Todo(todoName: 'Dart kayak kintil'),
-    ];
-  }
+    if (_todoBox.isEmpty) {
+      List<Todo> todoList = [
+        Todo(
+            taskName: 'Pertama kali buka todo ya!',
+            detail: 'Klik tombol plus di kanan bawah'),
+        Todo(
+            taskName: 'Tahan dan select untuk hapus',
+            detail: "Belum ditambahin vibration dll jadi masih plain"),
+        Todo(
+            taskName: 'Belum ada validation',
+            detail: "Bisa upload string kosong bang"),
+      ];
 
-  // * Nama function jangan diganti ganti
-  void loadTodos() {
-    // * Key value pair jangan sampe salah
-    // * Ambil data dari Hive dan cast ke List<Todo>
-    final rawList = _todoBox.get('TODO_LIST', defaultValue: []);
-
-    todoList = rawList.cast<Todo>();
-    print(todoList);
-  }
-
-  void updateTodos() {
-    _todoBox.put("TODO_LIST", todoList);
+      for (var todo in todoList) {
+        _todoBox.add(todo);
+      }
+    }
   }
 }

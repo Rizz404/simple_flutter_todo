@@ -7,7 +7,7 @@ part 'todo_model.g.dart';
 @HiveType(typeId: 0)
 class Todo extends HiveObject {
   @HiveField(0)
-  String todoName;
+  String taskName;
 
   @HiveField(1)
   bool? isTaskCompleted;
@@ -15,6 +15,20 @@ class Todo extends HiveObject {
   @HiveField(2)
   String? detail;
 
+  @HiveField(3)
+  DateTime? createdAt;
+
+  @HiveField(4)
+  DateTime? updatedAt;
+
   // * Ini namanya constructor ya
-  Todo({required this.todoName, this.isTaskCompleted = false, this.detail});
+  // * Bisa buat ternary di constructor
+  Todo({
+    required this.taskName,
+    this.isTaskCompleted = false,
+    this.detail,
+    DateTime? createdAt, // * Bisa diset saat pembuatan object
+    DateTime? updatedAt, // * Bisa diset saat pembuatan object
+  })  : createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
 }

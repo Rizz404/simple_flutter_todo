@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:simple_flutter_todo/model/todo_model.dart';
 import 'package:simple_flutter_todo/pages/home_page.dart';
 
+// ! SAVE AJA HARUS NUNGGU DULU EMANG DART dlkfjsdkfdsokffhsdhofdnsafoipadsfhsdcni
 void main() async {
   // * Assign librarynya ke main file (sama kaya react)
   await Hive.initFlutter();
@@ -12,7 +13,7 @@ void main() async {
   Hive.registerAdapter(TodoAdapter());
 
   // * Config hive nya
-  var box = await Hive.openBox('todoBox'); // * Nama databasenya (prefixnya box)
+  await Hive.openBox<Todo>('todoBox'); // * Nama databasenya (prefixnya box)
 
   runApp(const MyApp());
 }

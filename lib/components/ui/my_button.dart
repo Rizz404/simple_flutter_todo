@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class MyButton extends StatelessWidget {
+  // * Ini namanya props
   final String text;
   final VoidCallback onPressed;
 

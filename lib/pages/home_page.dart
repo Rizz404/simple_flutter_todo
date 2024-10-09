@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:simple_flutter_todo/components/todo_form.dart';
 import 'package:simple_flutter_todo/components/todo_tile.dart';
-import 'package:simple_flutter_todo/data/todo_database.dart';
 import 'package:simple_flutter_todo/model/todo_model.dart';
+import 'package:simple_flutter_todo/services/todo_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,55 +13,63 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // * Referensi databasenya
-  // ! namanya harus sama kaya di main file
-  final _todoBox = Hive.box("todoBox");
-  TodoDatabase todoDatabase = TodoDatabase();
+  final TodoService _todoService = TodoService();
+  List<Todo> _todos = [];
 
-  // * Ini ada snippetnya ya, jangan manual
-  @override
-  void initState() {
-    if (_todoBox.get('TODO_LIST') == null) {
-      todoDatabase.createInitialData();
-    } else {
-      todoDatabase.loadTodos();
-    }
-    super.initState();
-  }
-
+  // * Controller untuk form
   // * Kayak akses value di input html
-  final _controllerTodoName = TextEditingController();
+  final _controllerTaskName = TextEditingController();
   final _controllerDetail = TextEditingController();
 
   // * State untuk seleksi
   bool isInSelectionMode = false;
   List<int> selectedTodos = [];
 
-  void handleCheckboxChanged(bool? value, int index) {
-    setState(() {
-      todoDatabase.todoList[index].isTaskCompleted = value ?? false;
-    });
-    todoDatabase.updateTodos();
+  // * Ini ada snippetnya ya, jangan manual
+  @override
+  void initState() {
+    super.initState();
+    _loadTodos();
   }
 
-  void handleSave() {
+  @override
+  void dispose() {
+    // * Hapus controller dari memori
+    _controllerTaskName.dispose();
+    _controllerDetail.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadTodos() async {
+    final todos = await _todoService.getTodos();
     setState(() {
-      // * Belum tambahin input buat detail
-      todoDatabase.todoList.add(Todo(
-          todoName: _controllerTodoName.text,
-          detail: _controllerDetail.text,
-          isTaskCompleted: false));
-      _controllerTodoName.clear();
-      _controllerDetail.clear();
+      _todos = todos;
     });
+  }
+
+  Future<void> handleCheckboxChanged(bool? value, int index) async {
+    final todo = await _todoService.getTodoAt(index);
+
+    if (todo != null) {
+      todo.isTaskCompleted == value;
+      await _todoService.updateTodoAt(index, todo);
+      _loadTodos();
+    }
+  }
+
+  Future<void> handleSave() async {
+    final newTodo = Todo(
+        taskName: _controllerTaskName.text, detail: _controllerDetail.text);
+    await _todoService.addTodo(newTodo);
+    _controllerTaskName.clear();
+    _controllerDetail.clear();
     Navigator.of(context).pop();
-    todoDatabase.updateTodos();
+    _loadTodos();
   }
 
-  void handleDelete(int index) {
-    setState(() {
-      todoDatabase.todoList.removeAt(index);
-    });
-    todoDatabase.updateTodos();
+  Future<void> handleDelete(int index) async {
+    await _todoService.deleteTodoAt(index);
+    _loadTodos();
   }
 
   void handleOpenDialog() {
@@ -70,11 +77,11 @@ class _HomePageState extends State<HomePage> {
         context: context,
         builder: (context) {
           return TodoForm(
-            todoNameController: _controllerTodoName,
+            taskNameController: _controllerTaskName,
             detailController: _controllerDetail,
             onSave: () => handleSave(),
             onCancel: () {
-              _controllerTodoName.clear();
+              _controllerTaskName.clear();
               _controllerDetail.clear();
               Navigator.of(context).pop();
             },
@@ -96,25 +103,17 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void handleDeleteSelectedTodos() {
+  Future<void> handleSelectAll() async {
     setState(() {
-      selectedTodos
-          .sort((a, b) => b.compareTo(a)); // * Urutkan dari index terbesar
-      for (var index in selectedTodos) {
-        todoDatabase.todoList.removeAt(index);
-      }
-      selectedTodos.clear();
-      isInSelectionMode = false;
+      selectedTodos = List.generate(_todos.length, (index) => index);
     });
-    todoDatabase.updateTodos();
   }
 
-  void handleSelectAll() {
-    setState(() {
-      selectedTodos =
-          List.generate(todoDatabase.todoList.length, (index) => index);
-      isInSelectionMode = true;
-    });
+  Future<void> handleDeleteSelectedTodos() async {
+    for (var index in selectedTodos) {
+      await _todoService.deleteTodoAt(index);
+    }
+    _loadTodos();
   }
 
   void handleCancelSelection() {
@@ -126,6 +125,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // Ambil data dari database dan simpan ke dalam list untuk ListView
+
     return Scaffold(
         backgroundColor: Colors.grey.shade200,
         appBar: AppBar(
@@ -186,10 +187,10 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(16),
             child: ListView.builder(
               itemBuilder: (context, index) {
-                final todo = todoDatabase.todoList[index];
+                final todo = _todos[index];
 
                 return TodoTile(
-                  todoName: todo.todoName,
+                  taskName: todo.taskName,
                   detail: todo.detail ?? '',
                   isTaskCompleted: todo.isTaskCompleted ?? false,
                   onChanged: (value) => handleCheckboxChanged(value, index),
@@ -200,7 +201,7 @@ class _HomePageState extends State<HomePage> {
                   isSelected: selectedTodos.contains(index),
                 );
               },
-              itemCount: todoDatabase.todoList.length,
+              itemCount: _todos.length,
             )));
   }
 }
