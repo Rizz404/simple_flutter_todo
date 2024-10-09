@@ -10,7 +10,7 @@ class Todo extends HiveObject {
   String taskName;
 
   @HiveField(1)
-  bool? isTaskCompleted;
+  bool isTaskCompleted;
 
   @HiveField(2)
   String? detail;

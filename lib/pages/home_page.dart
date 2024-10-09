@@ -42,6 +42,11 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadTodos() async {
     final todos = await _todoService.getTodos();
+
+    if (todos.isEmpty) {
+      await _todoService.createInitialData();
+    }
+
     setState(() {
       _todos = todos;
     });
@@ -104,15 +109,19 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> handleSelectAll() async {
+    final todo = await _todoService.getTodos();
+
     setState(() {
-      selectedTodos = List.generate(_todos.length, (index) => index);
+      selectedTodos = List.generate(todo.length, (index) => index);
     });
   }
 
   Future<void> handleDeleteSelectedTodos() async {
-    for (var index in selectedTodos) {
-      await _todoService.deleteTodoAt(index);
-    }
+    await _todoService.deleteSelectedTodosAtIndices(selectedTodos);
+    setState(() {
+      selectedTodos.clear();
+      isInSelectionMode = false;
+    });
     _loadTodos();
   }
 
@@ -190,9 +199,7 @@ class _HomePageState extends State<HomePage> {
                 final todo = _todos[index];
 
                 return TodoTile(
-                  taskName: todo.taskName,
-                  detail: todo.detail ?? '',
-                  isTaskCompleted: todo.isTaskCompleted ?? false,
+                  todo: todo,
                   onChanged: (value) => handleCheckboxChanged(value, index),
                   onDelete: () => handleDelete(index),
                   onSelectionChange: (isSelected) =>

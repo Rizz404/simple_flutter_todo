@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:simple_flutter_todo/model/todo_model.dart';
+import 'package:vibration/vibration.dart';
 
 class TodoTile extends StatefulWidget {
-  final String taskName;
-  final String? detail;
-  final bool isTaskCompleted;
+  final Todo todo;
   final bool isSelected;
   final bool isInSelectionMode;
   final Function(bool?) onChanged;
@@ -12,9 +12,7 @@ class TodoTile extends StatefulWidget {
 
   const TodoTile({
     super.key,
-    required this.taskName,
-    this.detail,
-    required this.isTaskCompleted,
+    required this.todo,
     required this.onChanged,
     required this.onDelete,
     required this.onSelectionChange,
@@ -33,14 +31,14 @@ class _TodoTileState extends State<TodoTile> {
   @override
   Widget build(BuildContext context) {
     bool isDetailLong =
-        widget.detail != null && widget.detail!.length > charLimit;
+        widget.todo.detail != null && widget.todo.detail!.length > charLimit;
 
     return GestureDetector(
       onLongPress: () => widget.onSelectionChange(true),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: widget.isTaskCompleted
+          color: widget.todo.isTaskCompleted
               ? Colors.white.withOpacity(0.2)
               : Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -69,7 +67,7 @@ class _TodoTileState extends State<TodoTile> {
       leading: _buildLeading(),
       title: _buildTitle(),
       subtitle: Text(
-        '${widget.detail!.substring(0, charLimit)}...',
+        '${widget.todo.detail!.substring(0, charLimit)}...',
         style: TextStyle(
           color: Colors.grey[600],
           fontSize: 14,
@@ -87,12 +85,12 @@ class _TodoTileState extends State<TodoTile> {
               color: Colors.grey[600],
             ),
       children: [
-        if (widget.detail != null && widget.detail!.isNotEmpty)
+        if (widget.todo.detail != null && widget.todo.detail!.isNotEmpty)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             alignment: Alignment.centerLeft,
             child: Text(
-              widget.detail!,
+              widget.todo.detail!,
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 14,
@@ -108,9 +106,9 @@ class _TodoTileState extends State<TodoTile> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       leading: _buildLeading(),
       title: _buildTitle(),
-      subtitle: widget.detail != null && widget.detail!.isNotEmpty
+      subtitle: widget.todo.detail != null && widget.todo.detail!.isNotEmpty
           ? Text(
-              widget.detail!,
+              widget.todo.detail!,
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 14,
@@ -126,7 +124,7 @@ class _TodoTileState extends State<TodoTile> {
   Widget _buildLeading() {
     return !widget.isInSelectionMode
         ? Checkbox(
-            value: widget.isTaskCompleted,
+            value: widget.todo.isTaskCompleted,
             onChanged: widget.onChanged,
             activeColor: Colors.blueGrey[600],
           )
@@ -135,12 +133,12 @@ class _TodoTileState extends State<TodoTile> {
 
   Widget _buildTitle() {
     return Text(
-      widget.taskName,
+      widget.todo.taskName,
       style: TextStyle(
         color: Colors.black87,
         fontWeight: FontWeight.bold,
         fontSize: 16,
-        decoration: widget.isTaskCompleted
+        decoration: widget.todo.isTaskCompleted
             ? TextDecoration.lineThrough
             : TextDecoration.none,
         decorationColor: Colors.black54,
@@ -157,13 +155,14 @@ class _TodoTileState extends State<TodoTile> {
         activeColor: Colors.blueGrey[600],
         shape: const CircleBorder(),
       );
-    } else if (widget.detail != null && widget.detail!.length > charLimit) {
+    } else if (widget.todo.detail != null &&
+        widget.todo.detail!.length > charLimit) {
       return Icon(
         isExpanded ? Icons.expand_less : Icons.expand_more,
         color: Colors.grey[600],
       );
     } else {
-      return const SizedBox.shrink(); // Returns an empty widget
+      return const SizedBox.shrink();
     }
   }
 }

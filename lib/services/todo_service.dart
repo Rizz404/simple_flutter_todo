@@ -36,6 +36,44 @@ class TodoService {
 
   Future<void> deleteTodoAt(int index) async {
     final box = await _box;
-    await box.deleteAt(index);
+
+    if (index < box.length) {
+      await box.deleteAt(index);
+    }
+  }
+
+  // * Indices cuma plural dari index jangan bingung
+  Future<void> deleteSelectedTodosAtIndices(List<int> indices) async {
+    final box = await _box;
+
+    // * Sorting desecending, kaga tau logic nya gimana
+    indices.sort((a, b) => b.compareTo(a));
+    for (var index in indices) {
+      if (index < box.length) {
+        await box.deleteAt(index);
+      }
+    }
+  }
+
+  Future<void> createInitialData() async {
+    final box = await _box;
+
+    if (box.isEmpty) {
+      List<Todo> todos = [
+        Todo(
+            taskName: 'Pertama kali buka todo ya!',
+            detail: 'Klik tombol plus di kanan bawah'),
+        Todo(
+            taskName: 'Tahan dan select untuk hapus',
+            detail: "Belum ditambahin vibration dll jadi masih plain"),
+        Todo(
+            taskName: 'Belum ada validation',
+            detail: "Bisa upload string kosong bang"),
+      ];
+
+      for (var todo in todos) {
+        await box.add(todo);
+      }
+    }
   }
 }

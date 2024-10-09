@@ -18,7 +18,7 @@ class TodoAdapter extends TypeAdapter<Todo> {
     };
     return Todo(
       taskName: fields[0] as String,
-      isTaskCompleted: fields[1] as bool?,
+      isTaskCompleted: fields[1] as bool,
       detail: fields[2] as String?,
       createdAt: fields[3] as DateTime?,
       updatedAt: fields[4] as DateTime?,
